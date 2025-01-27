@@ -9,3 +9,56 @@ class Robot:
     self.angle=angle
     self.score=0
     self.weight=weight
+
+class Cylindre:
+  def __init__(self,x,y,R,score):
+    self.x=x
+    self.y=y
+    self.R=R
+    self.score=score
+
+
+
+N=10
+Cylindre=[]
+x=[]
+y=[]
+R=[]
+figure, axes = plt.subplots()
+
+axes.set_aspect( 1 )
+
+def tirage_nouveau_point():
+  x=random.random()
+  y=random.random()
+  while x<0.05 or x>0.95:
+    x=random.random()
+  while y<0.05 or y>0.95:
+    y=random.random()
+  return x,y
+
+def rayon(R):
+  if R<0.5:
+    return 0.01
+  return 0.02
+
+def valeur(i):
+  if nr==0.01:
+    return 1
+  if nr==0.02:
+    test=random.random()
+    if test<0.5:
+      return 2
+  return 3
+
+for i in range(N):
+  nx,ny=tirage_nouveau_point()
+  nr=rayon(random.random())
+  Cylindre.append([nx,ny,nr,valeur(nr)])
+  x.append(Cylindre[i][0])
+  y.append(Cylindre[i][1])
+  R.append(Cylindre[i][2])
+  Drawing_colored_circle = plt.Circle(( x[i] , y[i] ), R[i] )
+  axes.add_artist( Drawing_colored_circle )
+
+print(Cylindre)
