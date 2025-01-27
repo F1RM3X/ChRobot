@@ -1,3 +1,4 @@
+
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -37,15 +38,15 @@ def tirage_nouveau_point():
     y=random.random()
   return x,y
 
-def rayon(R):
-  if R<0.5:
-    return 0.01
-  return 0.02
+def masse(test):
+  if test<0.5:
+    return 1
+  return 2
 
 def valeur(i):
-  if nr==0.01:
+  if nm==1:
     return 1
-  if nr==0.02:
+  if nm==2:
     test=random.random()
     if test<0.5:
       return 2
@@ -53,12 +54,13 @@ def valeur(i):
 
 for i in range(N):
   nx,ny=tirage_nouveau_point()
-  nr=rayon(random.random())
-  Cylindre.append([nx,ny,nr,valeur(nr)])
+  nm=masse(random.random())
+  Cylindre.append([nx,ny,0.02,nm,valeur(nm)])
   x.append(Cylindre[i][0])
   y.append(Cylindre[i][1])
   R.append(Cylindre[i][2])
   Drawing_colored_circle = plt.Circle(( x[i] , y[i] ), R[i] )
   axes.add_artist( Drawing_colored_circle )
-
+  
+plt.show()
 print(Cylindre)
