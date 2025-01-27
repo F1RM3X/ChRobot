@@ -2,25 +2,91 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+import math
 
+## Dimensions cylindre
+diametre=1.0 #mètre
+hauteur=1.0 #mètre
 
+##Paramètres consommation
+b=1e-2
+b0=1e-2
+qmax=1e4 #fuel initial
+
+#Paramètres vitesse
+a=0.0698
+vo=1 #m/s
+
+#Autre paramètres
+N=20 #nb cylindres
+scoref=0 #score final
+tmax=60 #temps maximal en secondes
+
+#Classes
 class Robot:
-  def __init__(self,speed,angle,weight):
-    self.speed=speed
-    self.angle=angle
-    self.score=0
-    self.weight=weight
+    def __init__(self):
+        self.speed=0.0
+        self.angle=0.0
+        self.p=0 #nbre de points
+        self.u=0.0 #masse
+        self.q=b*self.u+b0
+    def go(self):
+        self.speed=v0*math.exp(-a*self.u)
+    def turn(self):
+        pass
+    def touch(self,type):
+        if type==1:
+            self.p+=1
+            self.u+=1        
+        if type==2:
+            self.p+=2
+            self.u+=2
+        if type==3:
+            self.p+=3
+            self.u+=2
+    def finish(self):
+        self.speed=0
+        scoref=self.p
 
 class Cylindre:
-  def __init__(self,x,y,R,score):
-    self.x=x
-    self.y=y
-    self.R=R
-    self.score=score
+    def __init__(self,x,y,type):
+        self.x=x
+        self.y=y
+        self.R=diametre/2
+        if type==1:
+            self.r=1 #recompense
+            self.m=1 #masse       
+        if type==2:
+            self.r=2
+            self.m=2
+        if type==3:
+            self.r=3
+            self.m=2
+            
+    def touched(self):
+        self.score=0                
+
+
+def tirage_nouveau_point():
+  x=random.random()
+  y=random.random()
+  while x<0.05 or x>0.95:
+    x=random.random()
+  while y<0.05 or y>0.95:
+    y=random.random()
+  return x,y
+
+#Création Cylindres
+
+for i in range (N):
+    nx,ny=tirage_nouveau_point()
+    ntype= random.randrange(1, 3, 1)
+    exec("prenom"+str(i)+"='"+tab[i]+"'")= Cylindre(nx,ny,ntype)
+print(prenom1)
 
 
 
-N=10
+'''
 Cylindre=[]
 x=[]
 y=[]
@@ -52,6 +118,7 @@ def valeur(i):
       return 2
   return 3
 
+
 for i in range(N):
   nx,ny=tirage_nouveau_point()
   nm=masse(random.random())
@@ -61,6 +128,13 @@ for i in range(N):
   R.append(Cylindre[i][2])
   Drawing_colored_circle = plt.Circle(( x[i] , y[i] ), R[i] )
   axes.add_artist( Drawing_colored_circle )
-  
-plt.show()
-print(Cylindre)
+
+x_robot=[0]
+y_robot=[0]
+temps=np.linspace(0,100,101)
+for i in range(len(temps)):
+  direction=360*random.random()
+  x_robot.append(x_robot[i-1]+np.cos(direction))
+  y_robot.append(y_robot[i-1]+np.sin(direction))
+print(x_robot)
+plt.plot(x_robot,y_robot) '''
