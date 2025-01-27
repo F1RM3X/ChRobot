@@ -25,6 +25,8 @@ tmax=60 #temps maximal en secondes
 #Classes
 class Robot:
     def __init__(self):
+        self.x=0.0
+        self.y=0.0
         self.speed=0.0
         self.angle=0.0
         self.p=0 #nbre de points
@@ -64,26 +66,54 @@ class Cylindre:
             self.m=2
             
     def touched(self):
-        self.score=0                
+        self.r=0
+    def getx(self):
+        return self.x
+    def gety(self):
+        return self.y
+    def getR(self):
+        return self.R
+    def __str__(self):
+        return f"recompense:{self.r};masse:{self.m}"            
 
-
-def tirage_nouveau_point():
-  x=random.random()
-  y=random.random()
-  while x<0.05 or x>0.95:
-    x=random.random()
-  while y<0.05 or y>0.95:
-    y=random.random()
-  return x,y
-
+#Création Robot
+robot=Robot()
 #Création Cylindres
+Cylindres = []
+Cylindres.append(Cylindre(1.7554 , 1.8713 , 3.0000))
+Cylindres.append(Cylindre(7.8513 , 1.7958 , 2.0000))
+Cylindres.append(Cylindre(13.4731,  3.9480,  1.0000))
+Cylindres.append(Cylindre(18.1907,  2.0316,  1.0000))
+Cylindres.append(Cylindre(2.7522 , 6.3233 , 1.0000))
+Cylindres.append(Cylindre(8.7189 , 8.6390 , 1.0000))
+Cylindres.append(Cylindre(13.4533,  6.7822,  2.0000))
+Cylindres.append(Cylindre(17.7831,  6.0675,  2.0000))
+Cylindres.append(Cylindre(2.2758 ,11.9382 , 2.0000))
+Cylindres.append(Cylindre(6.4845 ,11.5363 , 3.0000))
+Cylindres.append(Cylindre(12.2687, 11.2827,  2.0000))
+Cylindres.append(Cylindre(17.7956, 12.4128,  3.0000))
+Cylindres.append(Cylindre(3.0878 ,18.0997 , 2.0000))
+Cylindres.append(Cylindre(7.9156 ,16.1008 , 3.0000))
+Cylindres.append(Cylindre(11.2064, 16.9588,  1.0000))
+Cylindres.append(Cylindre(17.5926, 17.9633,  3.0000))
+Cylindres.append(Cylindre(2.2229 ,23.4599 , 1.0000))
+Cylindres.append(Cylindre(8.1551 ,23.9059 , 3.0000))
+Cylindres.append(Cylindre(12.5940, 21.9754,  3.0000))
+Cylindres.append(Cylindre(16.3169, 22.8329,  1.0000))
 
-for i in range (N):
-    nx,ny=tirage_nouveau_point()
-    ntype= random.randrange(1, 3, 1)
-    exec("prenom"+str(i)+"='"+tab[i]+"'")= Cylindre(nx,ny,ntype)
-print(prenom1)
 
+figure, axes = plt.subplots()
+axes.set_aspect( 1 )
+
+for i in range(len(Cylindres)):
+    a=Cylindres[i].getx()
+    b=Cylindres[i].gety()
+    c=Cylindres[i].getR()
+    Drawing_colored_circle = plt.Circle(( a,b), c )
+    plt.annotate(i+1,(a , b))
+    axes.add_artist( Drawing_colored_circle )
+
+plt.show()
 
 
 '''
@@ -95,28 +125,6 @@ figure, axes = plt.subplots()
 
 axes.set_aspect( 1 )
 
-def tirage_nouveau_point():
-  x=random.random()
-  y=random.random()
-  while x<0.05 or x>0.95:
-    x=random.random()
-  while y<0.05 or y>0.95:
-    y=random.random()
-  return x,y
-
-def masse(test):
-  if test<0.5:
-    return 1
-  return 2
-
-def valeur(i):
-  if nm==1:
-    return 1
-  if nm==2:
-    test=random.random()
-    if test<0.5:
-      return 2
-  return 3
 
 
 for i in range(N):
