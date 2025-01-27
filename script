@@ -1,3 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+
+
+class Robot:
+  def __init__(self,speed,angle,weight):
+    self.speed=speed
+    self.angle=angle
+    self.score=0
+    self.weight=weight
