@@ -5,7 +5,7 @@ import random
 import math
 
 ## Dimensions cylindre
-diametre=1.0 #mètre
+rayon=0.5 #mètre
 hauteur=1.0 #mètre
 
 ##Paramètres consommation
@@ -49,12 +49,16 @@ class Robot:
     def finish(self):
         self.speed=0
         scoref=self.p
+    def getx(self):
+        return self.x
+    def gety(self):
+        return self.y
 
 class Cylindre:
     def __init__(self,x,y,type):
         self.x=x
         self.y=y
-        self.R=diametre/2
+        self.R=rayon
         if type==1:
             self.r=1 #recompense
             self.m=1 #masse       
@@ -78,6 +82,12 @@ class Cylindre:
 
 #Création Robot
 robot=Robot()
+figure, axes = plt.subplots()
+axes.set_aspect( 1 )
+a=robot.getx()
+b=robot.gety()
+plt.plot(a,b,marker="x", color="red")
+
 #Création Cylindres
 Cylindres = []
 Cylindres.append(Cylindre(1.7554 , 1.8713 , 3.0000))
@@ -102,9 +112,6 @@ Cylindres.append(Cylindre(12.5940, 21.9754,  3.0000))
 Cylindres.append(Cylindre(16.3169, 22.8329,  1.0000))
 
 
-figure, axes = plt.subplots()
-axes.set_aspect( 1 )
-
 for i in range(len(Cylindres)):
     a=Cylindres[i].getx()
     b=Cylindres[i].gety()
@@ -115,34 +122,5 @@ for i in range(len(Cylindres)):
 
 plt.show()
 
-
-'''
-Cylindre=[]
-x=[]
-y=[]
-R=[]
-figure, axes = plt.subplots()
-
-axes.set_aspect( 1 )
-
-
-
-for i in range(N):
-  nx,ny=tirage_nouveau_point()
-  nm=masse(random.random())
-  Cylindre.append([nx,ny,0.02,nm,valeur(nm)])
-  x.append(Cylindre[i][0])
-  y.append(Cylindre[i][1])
-  R.append(Cylindre[i][2])
-  Drawing_colored_circle = plt.Circle(( x[i] , y[i] ), R[i] )
-  axes.add_artist( Drawing_colored_circle )
-
-x_robot=[0]
-y_robot=[0]
-temps=np.linspace(0,100,101)
-for i in range(len(temps)):
-  direction=360*random.random()
-  x_robot.append(x_robot[i-1]+np.cos(direction))
-  y_robot.append(y_robot[i-1]+np.sin(direction))
-print(x_robot)
-plt.plot(x_robot,y_robot) '''
+for i in range(len(Cylindres)):
+    if 
