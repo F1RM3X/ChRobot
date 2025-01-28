@@ -1,0 +1,266 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import random
+import math
+
+N=10
+Cylindre=[]
+x=[]
+y=[]
+R=[]
+figure, axes = plt.subplots()
+
+donnees=np.loadtxt("C:\CHALLENGE\donnees-map.txt")
+
+Cylindre=[[],[],[]]
+
+for i in range(len(donnees)):
+  Cylindre[0].append(donnees[i][0])
+  Cylindre[1].append(donnees[i][1])
+  Cylindre[2].append(donnees[i][2])
+
+
+valeur1=[[],[]]
+valeur2=[[],[]]
+valeur3=[[],[]]
+X1=[]
+X2=[]
+
+for i in range(len(Cylindre[0])):
+  if Cylindre[2][i]==1.0:
+    valeur1[0].append(Cylindre[0][i])
+    valeur1[1].append(Cylindre[1][i])
+    X1.append(i)
+  if Cylindre[2][i]==2.0:
+    valeur2[0].append(Cylindre[0][i])
+    valeur2[1].append(Cylindre[1][i])
+    X2.append(i)
+  if Cylindre[2][i]==3.0:
+    valeur3[0].append(Cylindre[0][i])
+    valeur3[1].append(Cylindre[1][i])
+    X2.append(i)
+
+x=Cylindre[0]
+y=Cylindre[1]
+valeur=Cylindre[2]
+
+for i in range(len(x)):
+  Drawing_colored_circle = plt.Circle(( x[i] , y[i] ),0.5)
+  plt.annotate(Cylindre[2][i],(x[i] , y[i]))
+  axes.add_artist( Drawing_colored_circle )
+
+plt.plot(x,y,'.')
+
+def distance_euclidienne(x1,y1,x2,y2):
+  return np.sqrt(((x2-x1)**2)+((y2-y1)**2))
+
+M1=np.array([np.zeros(len(valeur1[0])) for i in range(len(valeur1[0]))])
+for i in range(len(valeur1[0])):
+  for j in range(len(valeur1[0])):
+    M1[i][j]=distance_euclidienne(valeur1[0][i],valeur1[1][i],valeur1[0][j],valeur1[1][j])
+
+
+M=np.array([np.zeros(20) for i in range(20)])
+for i in range(len(x)):
+  for j in range(len(y)):
+    M[i][j]=distance_euclidienne(Cylindre[0][i],Cylindre[1][i],Cylindre[0][j],Cylindre[1][j])
+
+M2=np.array([np.zeros(len(X2)) for i in range(len(X2))])
+for i in range(len(X2)):
+  for j in range(len(X2)):
+    M2[i][j]=distance_euclidienne(Cylindre[0][X2[i]],Cylindre[1][X2[i]],Cylindre[0][X2[j]],Cylindre[1][X2[j]])
+
+
+
+def projete(Cylindre,i,j,k):
+  vectDirect = np.array([Cylindre[0][j]-Cylindre[0][i], Cylindre[1][j]-Cylindre[1][i]])
+  vectProj = np.array([Cylindre[0][k]-Cylindre[0][i], Cylindre[1][k]-Cylindre[1][i]])
+  proj = (np.dot(vectProj, vectDirect)/np.dot(vectDirect, vectDirect)) * vectDirect
+  point_proj = (Cylindre[0][i], Cylindre[1][i])+proj
+  return point_proj
+
+
+P=np.array([np.zeros(20) for i in range(20)])
+
+def entre(xa,ya,xc,yc,i,j,k):
+  return distance_euclidienne(xa,ya,projete(Cylindre,i,j,k)[0],projete(Cylindre,i,j,k)[1])+distance_euclidienne(projete(Cylindre,i,j,k)[0],projete(Cylindre,i,j,k)[1],xc,yc)-distance_euclidienne(xa,ya,xc,yc)<0.001
+
+#print(entre(1.7554,1.8713,7.8513,1.7958,13.4731,3.9480))
+
+c=0
+for i in range(len(Cylindre[0])):
+  for j in range(len(Cylindre[0])):
+    P[i][j]=1
+    if i==j:
+      P[i][j]=0
+    for k in range(len(Cylindre[0])):
+      if k!=i and k!=j:
+        if entre(Cylindre[0][i],Cylindre[1][i],Cylindre[0][j],Cylindre[1][j],i,j,k):
+          c=c+1
+          if distance_euclidienne(Cylindre[0][k],Cylindre[1][k],projete(Cylindre,i,j,k)[0],projete(Cylindre,i,j,k)[1])<0.5:
+            P[i][j]=0
+
+#print(np.where(M[0] == min(np.delete(M[0],0))))
+orientation_actuelle=0
+def calcul_angle(x,y,x_obj,y_obj):
+  global orientation_actuelle
+  if y_obj-y>0 and x_obj-x>0:
+    theta= np.arctan((y_obj-y)/(x_obj-x))*180/np.pi
+  if y_obj-y<0 and x_obj-x>0:
+    theta= -np.arctan(-(y_obj-y)/(x_obj-x))*180/np.pi
+  if y_obj-y>0 and x_obj-x<0:
+    theta= 180-np.arctan(-(y_obj-y)/(x_obj-x))*180/np.pi
+  if y_obj-y<0 and x_obj-x<0:
+    theta= 180+np.arctan((y_obj-y)/(x_obj-x))*180/np.pi
+
+  orientation=theta-orientation_actuelle
+  orientation_actuelle=orientation_actuelle+orientation
+  return str('TURN ')+str(orientation)
+
+
+#L=[0, 4, 8, 9, 5, 10, 14, 13, 12, 16, 17, 18, 19, 15, 11, 7, 3, 2, 6, 1]
+L=[0, 1, 2, 3, 7, 6, 10, 9, 13, 14, 11, 15, 19, 18, 17, 16, 12, 8, 4, 5]
+
+Turn=[calcul_angle(0,0,Cylindre[0][0],Cylindre[1][0])]
+
+distance=[str('GO ')+str(distance_euclidienne(0,0,Cylindre[0][0],Cylindre[1][0]))]
+
+
+for i in range(19):
+  Turn.append(calcul_angle(Cylindre[0][L[i]],Cylindre[1][L[i]],Cylindre[0][L[i+1]],Cylindre[1][L[i+1]]))
+  distance.append(str('GO ')+str(distance_euclidienne(Cylindre[0][L[i]],Cylindre[1][L[i]],Cylindre[0][L[i+1]],Cylindre[1][L[i+1]])))
+
+
+#constantes à ajuster
+a0=1
+a1=1
+
+##Paramètres consommation
+b=1e-2
+b0=1e-2
+
+u=2
+vmax=10
+
+q=b*u+b0
+
+#x=[1.7554,7.8513,13.4731,18.1907,2.7522,8.7189,13.4533,17.7831,2.2758,6.4845,12.2687,17.7956,3.0878,7.9156,11.2064,17.5926,2.2229,8.1551,12.5940,16.3169]
+#y=[1.8713,1.7958,3.9480,2.0316,6.3233,8.6390,6.7822,6.0675,11.9382,11.5363,11.2827,12.4128,18.0997,16.1008,16.9588,17.9633,23.4599,23.9059,21.9754,22.8329]
+x=Cylindre[0]
+y=Cylindre[1]
+
+c_carb=np.zeros((20,20))
+for i in range (len(x)):
+    for j in range (len(y)):
+        c_carb[i][j]= q*math.sqrt(math.pow(x[j]-x[i],2)+math.pow(y[j]-y[i],2))
+
+
+
+t=np.zeros((20,20))
+for i in range (len(x)):
+    for j in range (len(y)):
+        t[i][j]= math.sqrt(math.pow(x[j]-x[i],2)+math.pow(y[j]-y[i],2))/vmax
+
+
+c=np.zeros((20,20))
+for i in range (len(x)):
+    for j in range (len(y)):
+        c[i][j]= a0*c_carb[i][j]+a1*t[i][j]
+
+def somme_chemin(liste, M):
+    m = 0
+    for i in range(len(liste) - 1):
+      m += M[liste[i]][liste[i + 1]]
+    m += M[liste[-1]][liste[0]]
+    return m
+
+def Temperature(t):
+    return 10/np.log(t)
+
+def Pck_cest_notre_Pb(X,M,N):
+    Xmin=X
+    #X=[13, 8, 38, 5, 36, 14, 44, 32, 24, 37, 7, 42, 11, 35, 9, 15, 6, 41, 29, 31, 22, 17, 23, 25, 3, 45, 12, 26, 4, 28, 47, 49, 18, 30, 48, 34, 40, 46, 39, 0, 2, 16, 21, 19, 33, 43, 1, 10, 27, 20]
+    #Xmin=[13, 8, 38, 5, 36, 14, 44, 32, 24, 37, 7, 42, 11, 35, 9, 15, 6, 41, 29, 31, 22, 17, 23, 25, 3, 45, 12, 26, 4, 28, 47, 49, 18, 30, 48, 34, 40, 46, 39, 0, 2, 16, 21, 19, 33, 43, 1, 10, 27, 20]
+    Valeurmin=somme_chemin(X, M)
+    Valeuractuelle=somme_chemin(X, M)
+    for i in range(N):
+        Xp=X.copy()
+        random.shuffle(Xp)
+        XP=X.copy()
+        XP[Xp[0]],XP[Xp[1]]=XP[Xp[1]],XP[Xp[0]]
+        Vtransition=somme_chemin(XP, M)
+        rot=np.exp(1/Temperature(i+2)*(Valeuractuelle-Vtransition))
+        U=random.uniform(0,1)
+        if(rot>=1 or U<rot):
+            X=XP.copy()
+            Valeuractuelle=Vtransition
+            if(Valeuractuelle<Valeurmin):
+                Xmin=X
+                Valeurmin=Valeuractuelle
+    return [X,Valeurmin,Xmin]
+X=[i for i in range(20)]
+X=Pck_cest_notre_Pb(X,M,1000000)[2]
+X1_1=[i for i in range(len(X1))]
+X2_1=[i for i in range(len(X2))]
+X1_1=Pck_cest_notre_Pb(X1_1,M1,1000000)[2]
+X2_1=Pck_cest_notre_Pb(X2_1,M2,1000000)[2]
+
+print(X)
+X1_2=[i for i in range(len(X1))]
+c=0
+for i in X1_1:
+  X1_2[c]=X1[i]
+  c=c+1
+print(X1_2)
+
+X2_2=[i for i in range(len(X2))]
+c=0
+for i in X2_1:
+  X2_2[c]=X2[i]
+  c=c+1
+print(X2_2)
+
+axes.set_aspect( 1 )
+
+def tirage_nouveau_point():
+  x=random.random()
+  y=random.random()
+  while x<0.05 or x>0.95:
+    x=random.random()
+  while y<0.05 or y>0.95:
+    y=random.random()
+  return x,y
+
+def masse(test):
+  if test<0.5:
+    return 1
+  return 2
+
+def valeur(i):
+  if nm==1:
+    return 1
+  if nm==2:
+    test=random.random()
+    if test<0.5:
+      return 2
+  return 3
+
+for i in range(N):
+  nx,ny=tirage_nouveau_point()
+  nm=masse(random.random())
+  Cylindre.append([nx,ny,0.02,nm,valeur(nm)])
+  x.append(Cylindre[i][0])
+  y.append(Cylindre[i][1])
+  R.append(Cylindre[i][2])
+  Drawing_colored_circle = plt.Circle(( x[i] , y[i] ), R[i] )
+  axes.add_artist( Drawing_colored_circle )
+
+
+
+with open ("C:\CHALLENGE\script.txt", "w") as script:
+    for i in range (len(Turn)):
+        script.write(Turn[i])
+        script.write("\n")
+        script.write(distance[i])
+        script.write("\n")
+    script.write(str('FINISH'))

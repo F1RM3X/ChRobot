@@ -11,9 +11,12 @@ a1=1
 b=1e-2
 b0=1e-2
 
-u=2
-vmax=10
+#Paramètres vitesse
+a=0.0698
+vo=1 #m/s
 
+u=0
+vmax=v0*math.exp(-a*u)
 q=b*u+b0
 
 x=[1.7554,7.8513,13.4731,18.1907,2.7522,8.7189,13.4533,17.7831,2.2758,6.4845,12.2687,17.7956,3.0878,7.9156,11.2064,17.5926,2.2229,8.1551,12.5940,16.3169]
@@ -23,6 +26,7 @@ c_carb=np.zeros((20,20))
 for i in range (len(x)):
     for j in range (len(y)):
         c_carb[i][j]= q*math.sqrt(math.pow(x[j]-x[i],2)+math.pow(y[j]-y[i],2))
+        
         
         
 
