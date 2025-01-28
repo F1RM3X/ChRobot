@@ -123,4 +123,5 @@ for i in range(len(Cylindres)):
 plt.show()
 
 for i in range(len(Cylindres)):
-    if 
+    if (robot.getx()=>Cylindres[i].getx()-1 & robot.getx()<=Cylindres[i].getx()+1) & robot.gety()==Cylindres[i].gety():
+        

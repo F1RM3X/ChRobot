@@ -1,0 +1,139 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import random
+
+
+N=10
+Cylindre=[]
+x=[]
+y=[]
+R=[]
+figure, axes = plt.subplots()
+fichier=open("C:\CHALLENGE\donnees-map.txt","r")
+print(fichier.readline()[1])
+axes.set_aspect( 1 )
+
+def tirage_nouveau_point():
+  x=random.random()
+  y=random.random()
+  while x<0.05 or x>0.95:
+    x=random.random()
+  while y<0.05 or y>0.95:
+    y=random.random()
+  return x,y
+
+def masse(test):
+  if test<0.5:
+    return 1
+  return 2
+
+def valeur(i):
+  if nm==1:
+    return 1
+  if nm==2:
+    test=random.random()
+    if test<0.5:
+      return 2
+  return 3
+
+for i in range(N):
+  nx,ny=tirage_nouveau_point()
+  nm=masse(random.random())
+  Cylindre.append([nx,ny,0.02,nm,valeur(nm)])
+  x.append(Cylindre[i][0])
+  y.append(Cylindre[i][1])
+  R.append(Cylindre[i][2])
+  Drawing_colored_circle = plt.Circle(( x[i] , y[i] ), R[i] )
+  axes.add_artist( Drawing_colored_circle )
+
+x=[1.7554,7.8513,13.4731,18.1907,2.7522,8.7189,13.4533,17.7831,2.2758,6.4845,12.2687,17.7956,3.0878,7.9156,11.2064,17.5926,2.2229,8.1551,12.5940,16.3169]
+y=[1.8713,1.7958,3.9480,2.0316,6.3233,8.6390,6.7822,6.0675,11.9382,11.5363,11.2827,12.4128,18.0997,16.1008,16.9588,17.9633,23.4599,23.9059,21.9754,22.8329]
+valeur=[3,2,1,1,1,1,2,2,2,3,2,3,2,3,1,3,1,3,3,1]
+for i in range(len(x)):
+  Drawing_colored_circle = plt.Circle(( x[i] , y[i] ),0.5)
+  plt.annotate(i,(x[i] , y[i]))
+  axes.add_artist( Drawing_colored_circle )
+
+plt.plot(x,y,'.')
+
+def distance_euclidienne(x1,y1,x2,y2):
+  return np.sqrt(((x2-x1)**2)+((y2-y1)**2))
+  
+
+M=np.array([np.zeros(20) for i in range(20)])
+for i in range(len(x)):
+  for j in range(len(y)):
+    M[i][j]=distance_euclidienne(x[i],y[i],x[j],y[j])
+
+Cylindre=[]
+Cylindre.append(x)
+Cylindre.append(y)
+def projete(Cylindre,i,j,k):
+  vectDirect = np.array([Cylindre[0][j]-Cylindre[0][i], Cylindre[1][j]-Cylindre[1][i]])
+  vectProj = np.array([Cylindre[0][k]-Cylindre[0][i], Cylindre[1][k]-Cylindre[1][i]])
+  proj = (np.dot(vectProj, vectDirect)/np.dot(vectDirect, vectDirect)) * vectDirect
+  point_proj = (Cylindre[0][i], Cylindre[1][i])+proj
+  return point_proj
+
+
+P=np.array([np.zeros(20) for i in range(20)])
+
+def entre(xa,ya,xc,yc,i,j,k):
+  return distance_euclidienne(xa,ya,projete(Cylindre,i,j,k)[0],projete(Cylindre,i,j,k)[1])+distance_euclidienne(projete(Cylindre,i,j,k)[0],projete(Cylindre,i,j,k)[1],xc,yc)-distance_euclidienne(xa,ya,xc,yc)<0.001
+
+#print(entre(1.7554,1.8713,7.8513,1.7958,13.4731,3.9480))
+
+c=0
+for i in range(len(Cylindre[0])):
+  for j in range(len(Cylindre[0])):
+    P[i][j]=1
+    if i==j:
+      P[i][j]=0
+    for k in range(len(Cylindre[0])):
+      if k!=i and k!=j:
+        if entre(Cylindre[0][i],Cylindre[1][i],Cylindre[0][j],Cylindre[1][j],i,j,k):
+          c=c+1
+          if distance_euclidienne(Cylindre[0][k],Cylindre[1][k],projete(Cylindre,i,j,k)[0],projete(Cylindre,i,j,k)[1])<0.5:
+            P[i][j]=0
+
+#print(np.where(M[0] == min(np.delete(M[0],0))))
+orientation_actuelle=0
+def calcul_angle(x,y,x_obj,y_obj):
+  global orientation_actuelle
+  if y_obj-y>0 and x_obj-x>0:
+    theta= np.arctan((y_obj-y)/(x_obj-x))*180/np.pi
+  if y_obj-y<0 and x_obj-x>0:
+    theta= -np.arctan(-(y_obj-y)/(x_obj-x))*180/np.pi
+  if y_obj-y>0 and x_obj-x<0:
+    theta= 180-np.arctan(-(y_obj-y)/(x_obj-x))*180/np.pi
+  if y_obj-y<0 and x_obj-x<0:
+    theta= 180+np.arctan((y_obj-y)/(x_obj-x))*180/np.pi
+
+  orientation=theta-orientation_actuelle
+  orientation_actuelle=orientation_actuelle+orientation
+  return str('TURN ')+str(orientation)
+
+
+L=[0, 4, 8, 9, 5, 10, 14, 13, 12, 16, 17, 18, 19, 15, 11, 7, 3, 2, 6, 1]
+
+Turn=[calcul_angle(0,0,1.7554,1.8713)]
+
+
+distance=[str('GO ')+str(distance_euclidienne(0,0,1.7554,1.8713))]
+
+
+for i in range(19):
+  Turn.append(calcul_angle(Cylindre[0][L[i]],Cylindre[1][L[i]],Cylindre[0][L[i+1]],Cylindre[1][L[i+1]]))
+  distance.append(str('GO ')+str(distance_euclidienne(Cylindre[0][L[i]],Cylindre[1][L[i]],Cylindre[0][L[i+1]],Cylindre[1][L[i+1]])))
+
+print(Turn)
+print(distance)
+
+
+with open ("C:\CHALLENGE\script.txt", "w") as script:
+    for i in range (len(Turn)):
+        script.write(Turn[i])
+        script.write("\n")
+        script.write(distance[i])
+        script.write("\n")
+    script.write(str('FINISH'))
